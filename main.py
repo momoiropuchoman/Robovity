@@ -26,6 +26,10 @@ class App:
         self.conversation = []
         self.recognition_lang = "ja-JP"
 
+        self.replys = False
+
+        self.TRIGGER = "銭ゲバさん"
+
     def run(self):
 
         with ThreadPoolExecutor(max_workers=2) as executor:
@@ -58,19 +62,26 @@ class App:
 
                     if "please recognize japanese" in text.lower():
                         self.recognition_lang = 'ja-JP'
+                        self.comment("日本語を認識します")
                     elif "英語を認識してください" in text:
                         self.recognition_lang = 'en-US'
+                        self.comment("Now I'm recognizing English.")
                     #elif "中国語を認識してください" in text:
                     #    self.recognition_lang = 'cmn-Hans-CN'
+                    elif text == self.TRIGGER:
+                        self.replys = True
 
-                    text = self.get_reply_from_chatpgt(text)
+                    elif self.TRIGGER in text or self.replys:
+                        text = self.get_reply_from_chatpgt(text)
 
-                    length = len(text)
-                    split_text = [text[i:i+130] for i in range(0, length, 130)]
+                        length = len(text)
+                        split_text = [text[i:i+130] for i in range(0, length, 130)]
 
-                    for t in split_text:
-                        self.comment(t)
-            
+                        for t in split_text:
+                            self.comment(t)
+
+                        self.replys = False
+
             time.sleep(0.3)
 
 
