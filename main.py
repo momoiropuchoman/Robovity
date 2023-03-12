@@ -24,8 +24,7 @@ class App:
         self.mic = sr.Microphone()
 
         self.conversation = []
-
-        self.translator = Translator(from_lang = "ja", to_lang = "zh-cn")
+        self.recognition_lang = "ja-JP"
 
     def run(self):
 
@@ -36,41 +35,41 @@ class App:
     def listen_voice(self):
         while True:
             with self.mic as source:
-                # マイク入力
+                # input sound through mic
                 audio = self.r.listen(source)
         
-            print("add to conversation")
             self.conversation.append(audio)
+            print("Conversation = " + str(len(self.conversation)))
 
     def recognize_voice(self) -> str:
         while True:
-            #print("Conversation = ", str(len(self.conversation)))
             if len(self.conversation) > 0:
                 audio = self.conversation.pop(0)
 
                 # recognize speech using Google Speech Recognition
                 try:
-                    text = self.r.recognize_google(audio, language='ja-JP')
-                    #text = self.r.recognize_google(audio, language='cmn-Hans-CN')
-                    #text = self.r.recognize_google(audio, language='en-US')
+                    text = self.r.recognize_google(audio, language=self.recognition_lang    )
                 except sr.UnknownValueError:
                     pass
                 except sr.RequestError as e:
                     pass
                 else:
                     print(text)
-                    print("")
-                    #text = self.get_reply_from_chatpgt("この次の文章に対して130字以内で会話のように返答してください。" + text)
-                    text = self.get_reply_from_chatpgt("この次の文章に対して簡単に返答してください。" + text)
-                    #text = self.translator.translate(text)
-                    #print(text)
+
+                    if "please recognize japanese" in text.lower():
+                        self.recognition_lang = 'ja-JP'
+                    elif "英語を認識してください" in text.lower():
+                        self.recognition_lang = 'en-US'
+                    #elif "中国語を認識してください" in text:
+                    #    self.recognition_lang = 'cmn-Hans-CN'
+
+                    text = self.get_reply_from_chatpgt(text)
 
                     length = len(text)
                     split_text = [text[i:i+130] for i in range(0, length, 130)]
 
                     for t in split_text:
                         self.comment(t)
-                        time.sleep(1)
             
             time.sleep(0.3)
 
@@ -89,7 +88,7 @@ class App:
         self.move_to_send()
         pyautogui.click()
 
-        #time.sleep(1)
+        time.sleep(1)
 
     def comment_chatgpt(self):
         time.sleep(10)
