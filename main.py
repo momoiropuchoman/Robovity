@@ -17,13 +17,15 @@ MOVE_X = 100
 class App:
 
     def __init__(self):
+
+        # get my API key of ChatGPT from the environment variable
         api_key = os.environ['CHAT_GPT_API_KEY']
         openai.api_key = api_key
 
-        self.r = sr.Recognizer()
         self.mic = sr.Microphone()
+        self.recognizer = sr.Recognizer()
 
-        self.conversation = []
+        self.questions = []
         self.recognition_lang = "ja-JP"
 
         self.replys = False
@@ -33,6 +35,7 @@ class App:
 
     def run(self):
 
+        # start with multi threads
         with ThreadPoolExecutor(max_workers=2) as executor:
             executor.submit(self.listen_voice)
             executor.submit(self.recognize_voice)
@@ -41,19 +44,19 @@ class App:
         while True:
             with self.mic as source:
                 # input sound through mic
-                audio = self.r.listen(source)
+                audio = self.recognizer.listen(source)
         
-            self.conversation.append(audio)
-            print("Conversation = " + str(len(self.conversation)))
+            self.questions.append(audio)
+            print("Questions = " + str(len(self.questions)))
 
     def recognize_voice(self) -> str:
         while True:
-            if len(self.conversation) > 0:
-                audio = self.conversation.pop(0)
+            if len(self.questions) > 0:
+                audio = self.questions.pop(0)
 
                 # recognize speech using Google Speech Recognition
                 try:
-                    recognized_text = self.r.recognize_google(audio, language=self.recognition_lang)
+                    recognized_text = self.recognizer.recognize_google(audio, language=self.recognition_lang)
                 except sr.UnknownValueError:
                     pass
                 except sr.RequestError as e:
