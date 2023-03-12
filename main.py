@@ -58,7 +58,7 @@ class App:
 
                     if "please recognize japanese" in text.lower():
                         self.recognition_lang = 'ja-JP'
-                    elif "英語を認識してください" in text.lower():
+                    elif "英語を認識してください" in text:
                         self.recognition_lang = 'en-US'
                     #elif "中国語を認識してください" in text:
                     #    self.recognition_lang = 'cmn-Hans-CN'
