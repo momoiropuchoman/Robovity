@@ -29,6 +29,7 @@ class App:
         self.replys = False
 
         self.TRIGGER = "銭ゲバさん"
+        self.MAX_COMMENT_SIZE = 130
 
     def run(self):
 
@@ -52,33 +53,32 @@ class App:
 
                 # recognize speech using Google Speech Recognition
                 try:
-                    text = self.r.recognize_google(audio, language=self.recognition_lang    )
+                    recognized_text = self.r.recognize_google(audio, language=self.recognition_lang)
                 except sr.UnknownValueError:
                     pass
                 except sr.RequestError as e:
                     pass
                 else:
-                    print(text)
+                    print(recognized_text)
 
-                    if "please recognize japanese" in text.lower():
+                    if "please recognize japanese" in recognized_text.lower():
                         self.recognition_lang = 'ja-JP'
                         self.comment("日本語を認識します")
-                    elif "英語を認識してください" in text:
+                    elif "英語を認識してください" in recognized_text:
                         self.recognition_lang = 'en-US'
                         self.comment("Now I'm recognizing English.")
-                    #elif "中国語を認識してください" in text:
+                    #elif "中国語を認識してください" in recognized_text:
                     #    self.recognition_lang = 'cmn-Hans-CN'
-                    elif text == self.TRIGGER:
+                    elif recognized_text == self.TRIGGER:
                         self.replys = True
 
-                    elif self.TRIGGER in text or self.replys:
-                        text = self.get_reply_from_chatpgt(text)
+                    elif self.TRIGGER in recognized_text or self.replys:
+                        answer = self.get_reply_from_chatpgt(recognized_text)
 
-                        length = len(text)
-                        split_text = [text[i:i+130] for i in range(0, length, 130)]
+                        split_answer = [answer[i:i+self.MAX_COMMENT_SIZE] for i in range(0, len(answer), self.MAX_COMMENT_SIZE)]
 
-                        for t in split_text:
-                            self.comment(t)
+                        for ans in split_answer:
+                            self.comment(ans)
 
                         self.replys = False
 
