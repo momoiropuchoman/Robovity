@@ -30,7 +30,7 @@ class App:
 
         self.replys = False
 
-        self.TRIGGER = "銭ゲバさん"
+        self.TRIGGER = "せいさん"
         self.MAX_COMMENT_SIZE = 130
 
     def run(self):
